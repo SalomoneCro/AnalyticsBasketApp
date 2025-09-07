@@ -15,14 +15,26 @@ export default function LoginPage() {
     setError(null)
 
     try {
+      const redirectTo = `${window.location.origin}/auth/callback`
+
+      console.log("[v0] Initiating Google OAuth with redirect:", redirectTo)
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       })
-      if (error) throw error
+      if (error) {
+        console.error("[v0] OAuth initiation error:", error)
+        throw error
+      }
     } catch (error: unknown) {
+      console.error("[v0] Login error:", error)
       setError(error instanceof Error ? error.message : "An error occurred")
       setIsLoading(false)
     }
