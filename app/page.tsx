@@ -618,19 +618,26 @@ export default function BasketballApp() {
               <div className="space-y-4">
                 <Button
                   onClick={() => setSelectedResult("convertido")}
-                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-lg"
+                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-green-300 to-green-400 hover:from-green-400 hover:to-green-500 text-white shadow-lg"
                   size="lg"
                 >
                   ✓ Convertido
                 </Button>
                 <Button
                   onClick={() => setSelectedResult("fallado")}
-                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg"
+                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-red-300 to-red-400 hover:from-red-400 hover:to-red-500 text-white shadow-lg"
                   size="lg"
                 >
                   ✗ Fallado
                 </Button>
               </div>
+              <Button
+                onClick={() => setSelectedShotType(null)}
+                variant="ghost"
+                className="w-full text-lg text-slate-600 hover:text-slate-800"
+              >
+                ← Volver a tipo de tiro
+              </Button>
             </div>
           )}
 
@@ -667,11 +674,11 @@ export default function BasketballApp() {
                 ))}
               </div>
               <Button
-                onClick={resetGame}
+                onClick={() => setSelectedResult(null)}
                 variant="ghost"
                 className="w-full text-lg text-slate-600 hover:text-slate-800"
               >
-                Cancelar
+                ← Volver a resultado
               </Button>
             </div>
           )}
@@ -696,8 +703,8 @@ export default function BasketballApp() {
                 </div>
               </div>
               <DialogFooter className="flex gap-2">
-                <Button onClick={resetGame} variant="outline" className="flex-1 bg-transparent">
-                  Cancelar
+                <Button onClick={() => setShowConfirmation(false)} variant="outline" className="flex-1 bg-transparent">
+                  ← Volver
                 </Button>
                 <Button onClick={confirmShot} className="flex-1">
                   Confirmar
@@ -747,7 +754,7 @@ export default function BasketballApp() {
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-2 mb-4">
-                <div className="text-2xl font-bold text-blue-600">{games.length} juegos</div>
+                <div className="text-2xl font-bold text-orange-600">{games.length} juegos</div>
                 <div className="text-lg text-slate-600">
                   {games.reduce((total, game) => total + game.shots.length, 0)} tiros totales
                 </div>
@@ -793,7 +800,7 @@ export default function BasketballApp() {
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-2 mb-4">
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-orange-600">
                   {teamStats.madeShots}/{teamStats.totalShots}
                 </div>
                 <div className="text-lg text-slate-600">{teamStats.percentage}% efectividad</div>
