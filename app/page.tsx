@@ -50,6 +50,8 @@ export default function BasketballApp() {
   const [newGameName, setNewGameName] = useState("")
   const [showNewGameDialog, setShowNewGameDialog] = useState(false)
 
+  const [statsFilter, setStatsFilter] = useState<"all" | string>("all") // "all" or game ID
+
   // Game state
   const [selectedShotType, setSelectedShotType] = useState<ShotType | null>(null)
   const [selectedResult, setSelectedResult] = useState<ShotResult | null>(null)
@@ -292,8 +294,10 @@ export default function BasketballApp() {
     }
   }
 
-  const getTeamStats = () => {
-    const allShots = games.flatMap((game) => game.shots)
+  const getTeamStats = (filter: "all" | string = "all") => {
+    const allShots =
+      filter === "all" ? games.flatMap((game) => game.shots) : games.find((game) => game.id === filter)?.shots || []
+
     const totalShots = allShots.length
     const madeShots = allShots.filter((s) => s.result === "convertido").length
     const percentage = totalShots > 0 ? Math.round((madeShots / totalShots) * 100) : 0
@@ -312,8 +316,9 @@ export default function BasketballApp() {
     return { totalShots, madeShots, percentage, statsByType }
   }
 
-  const getPlayerStats = () => {
-    const allShots = games.flatMap((game) => game.shots)
+  const getPlayerStats = (filter: "all" | string = "all") => {
+    const allShots =
+      filter === "all" ? games.flatMap((game) => game.shots) : games.find((game) => game.id === filter)?.shots || []
 
     return players.map((player) => {
       const playerShots = allShots.filter((s) => s.player_name === player.name)
@@ -578,21 +583,21 @@ export default function BasketballApp() {
               <div className="space-y-4">
                 <Button
                   onClick={() => setSelectedShotType("triple")}
-                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg"
+                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 shadow-lg"
                   size="lg"
                 >
                   Triple (3 puntos)
                 </Button>
                 <Button
                   onClick={() => setSelectedShotType("doble")}
-                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg"
+                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 shadow-lg"
                   size="lg"
                 >
                   Doble (2 puntos)
                 </Button>
                 <Button
                   onClick={() => setSelectedShotType("libre")}
-                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg"
+                  className="w-full h-20 text-xl font-bold bg-gradient-to-r from-orange-300 to-orange-400 hover:from-orange-400 hover:to-orange-500 shadow-lg"
                   size="lg"
                 >
                   Tiro libre (1 punto)
@@ -706,8 +711,8 @@ export default function BasketballApp() {
   }
 
   if (currentPage === "stats") {
-    const teamStats = getTeamStats()
-    const playerStats = getPlayerStats()
+    const teamStats = getTeamStats(statsFilter)
+    const playerStats = getPlayerStats(statsFilter)
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -768,9 +773,23 @@ export default function BasketballApp() {
 
           {/* Team Stats */}
           <Card className="shadow-sm border-slate-200">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-slate-800">Estadísticas del Equipo</CardTitle>
-              <p className="text-sm text-slate-600">Todos los juegos</p>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-slate-800 text-center">Estadísticas del Equipo</CardTitle>
+              <div className="mt-3">
+                <Label className="text-sm text-slate-600 font-medium">Filtrar por:</Label>
+                <select
+                  value={statsFilter}
+                  onChange={(e) => setStatsFilter(e.target.value)}
+                  className="w-full mt-1 p-2 border border-slate-300 rounded-md bg-white text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="all">Todos los juegos</option>
+                  {games.map((game) => (
+                    <option key={game.id} value={game.id}>
+                      {game.name} ({game.date})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-center space-y-2 mb-4">
@@ -802,7 +821,11 @@ export default function BasketballApp() {
           <Card className="shadow-sm border-slate-200">
             <CardHeader className="text-center pb-4">
               <CardTitle className="text-slate-800">Estadísticas por Jugador</CardTitle>
-              <p className="text-sm text-slate-600">Todos los juegos</p>
+              <p className="text-sm text-slate-600">
+                {statsFilter === "all"
+                  ? "Todos los juegos"
+                  : games.find((g) => g.id === statsFilter)?.name || "Juego seleccionado"}
+              </p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
